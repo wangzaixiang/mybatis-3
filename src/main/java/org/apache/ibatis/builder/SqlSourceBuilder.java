@@ -15,6 +15,7 @@
  */
 package org.apache.ibatis.builder;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +93,7 @@ public class SqlSourceBuilder extends BaseBuilder {
     private ParameterMapping buildParameterMapping(String content) {
       Map<String, String> propertiesMap = parseParameterMapping(content);
       String property = propertiesMap.get("property");
-      Class<?> propertyType;
+      Type propertyType;
       if (metaParameters.hasGetter(property)) { // issue #448 get type from additional params
         propertyType = Reflector.classOfType( metaParameters.getGetterType(property) );
       } else if (typeHandlerRegistry.hasTypeHandler(parameterType)) {
@@ -104,13 +105,13 @@ public class SqlSourceBuilder extends BaseBuilder {
       } else {
         MetaClass metaClass = MetaClass.forClass(parameterType, configuration.getReflectorFactory());
         if (metaClass.hasGetter(property)) {
-          propertyType = Reflector.classOfType( metaClass.getGetterType(property) );
+          propertyType = metaClass.getGetterType(property);
         } else {
           propertyType = Object.class;
         }
       }
       ParameterMapping.Builder builder = new ParameterMapping.Builder(configuration, property, propertyType);
-      Class<?> javaType = propertyType;
+      Type javaType = propertyType;
       String typeHandlerAlias = null;
       for (Map.Entry<String, String> entry : propertiesMap.entrySet()) {
         String name = entry.getKey();

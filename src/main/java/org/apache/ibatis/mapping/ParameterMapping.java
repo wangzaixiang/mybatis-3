@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
+ *    Copyright 2009-2021 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.apache.ibatis.mapping;
 
+import java.lang.reflect.Type;
 import java.sql.ResultSet;
 
 import org.apache.ibatis.session.Configuration;
@@ -31,7 +32,7 @@ public class ParameterMapping {
 
   private String property;
   private ParameterMode mode;
-  private Class<?> javaType = Object.class;
+  private Type javaType = Object.class;
   private JdbcType jdbcType;
   private Integer numericScale;
   private TypeHandler<?> typeHandler;
@@ -52,7 +53,7 @@ public class ParameterMapping {
       parameterMapping.mode = ParameterMode.IN;
     }
 
-    public Builder(Configuration configuration, String property, Class<?> javaType) {
+    public Builder(Configuration configuration, String property, Type javaType) {
       parameterMapping.configuration = configuration;
       parameterMapping.property = property;
       parameterMapping.javaType = javaType;
@@ -64,7 +65,7 @@ public class ParameterMapping {
       return this;
     }
 
-    public Builder javaType(Class<?> javaType) {
+    public Builder javaType(Type javaType) {
       parameterMapping.javaType = javaType;
       return this;
     }
@@ -116,7 +117,7 @@ public class ParameterMapping {
         if (parameterMapping.typeHandler == null) {
           throw new IllegalStateException("Type handler was null on parameter mapping for property '"
             + parameterMapping.property + "'. It was either not specified and/or could not be found for the javaType ("
-            + parameterMapping.javaType.getName() + ") : jdbcType (" + parameterMapping.jdbcType + ") combination.");
+            + parameterMapping.javaType.getTypeName() + ") : jdbcType (" + parameterMapping.jdbcType + ") combination.");
         }
       }
     }
@@ -149,7 +150,7 @@ public class ParameterMapping {
    *
    * @return the java type
    */
-  public Class<?> getJavaType() {
+  public Type getJavaType() {
     return javaType;
   }
 

@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2021 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.apache.ibatis.builder;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,6 +23,7 @@ import java.util.regex.Pattern;
 
 import org.apache.ibatis.mapping.ParameterMode;
 import org.apache.ibatis.mapping.ResultSetType;
+import org.apache.ibatis.reflection.Reflector;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeAliasRegistry;
@@ -119,7 +121,7 @@ public abstract class BaseBuilder {
     }
   }
 
-  protected TypeHandler<?> resolveTypeHandler(Class<?> javaType, String typeHandlerAlias) {
+  protected TypeHandler<?> resolveTypeHandler(Type javaType, String typeHandlerAlias) {
     if (typeHandlerAlias == null) {
       return null;
     }
@@ -132,7 +134,7 @@ public abstract class BaseBuilder {
     return resolveTypeHandler(javaType, typeHandlerType);
   }
 
-  protected TypeHandler<?> resolveTypeHandler(Class<?> javaType, Class<? extends TypeHandler<?>> typeHandlerType) {
+  protected TypeHandler<?> resolveTypeHandler(Type javaType, Class<? extends TypeHandler<?>> typeHandlerType) {
     if (typeHandlerType == null) {
       return null;
     }
@@ -140,7 +142,7 @@ public abstract class BaseBuilder {
     TypeHandler<?> handler = typeHandlerRegistry.getMappingTypeHandler(typeHandlerType);
     if (handler == null) {
       // not in registry, create a new one
-      handler = typeHandlerRegistry.getInstance(javaType, typeHandlerType);
+      handler = typeHandlerRegistry.getInstance(Reflector.classOfType(javaType), typeHandlerType);
     }
     return handler;
   }
