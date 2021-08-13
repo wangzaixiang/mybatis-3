@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2021 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.apache.ibatis.reflection;
 
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -93,11 +94,11 @@ public class MetaObject {
     return objectWrapper.getSetterNames();
   }
 
-  public Class<?> getSetterType(String name) {
+  public Type getSetterType(String name) {
     return objectWrapper.getSetterType(name);
   }
 
-  public Class<?> getGetterType(String name) {
+  public Type getGetterType(String name) {
     return objectWrapper.getGetterType(name);
   }
 

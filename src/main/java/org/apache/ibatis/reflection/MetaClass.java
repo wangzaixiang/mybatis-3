@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
+ *    Copyright 2009-2021 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ public class MetaClass {
   }
 
   public MetaClass metaClassForProperty(String name) {
-    Class<?> propType = reflector.getGetterType(name);
+    Class<?> propType = (Class<?>) reflector.getGetterType(name);
     return MetaClass.forClass(propType, reflectorFactory);
   }
 
@@ -68,7 +68,7 @@ public class MetaClass {
     return reflector.getSetablePropertyNames();
   }
 
-  public Class<?> getSetterType(String name) {
+  public Type getSetterType(String name) {
     PropertyTokenizer prop = new PropertyTokenizer(name);
     if (prop.hasNext()) {
       MetaClass metaProp = metaClassForProperty(prop.getName());
@@ -78,7 +78,7 @@ public class MetaClass {
     }
   }
 
-  public Class<?> getGetterType(String name) {
+  public Type getGetterType(String name) {
     PropertyTokenizer prop = new PropertyTokenizer(name);
     if (prop.hasNext()) {
       MetaClass metaProp = metaClassForProperty(prop);
@@ -89,13 +89,13 @@ public class MetaClass {
   }
 
   private MetaClass metaClassForProperty(PropertyTokenizer prop) {
-    Class<?> propType = getGetterType(prop);
-    return MetaClass.forClass(propType, reflectorFactory);
+    Type propType = getGetterType(prop);
+    return MetaClass.forClass((Class<?>) propType, reflectorFactory);
   }
 
-  private Class<?> getGetterType(PropertyTokenizer prop) {
-    Class<?> type = reflector.getGetterType(prop.getName());
-    if (prop.getIndex() != null && Collection.class.isAssignableFrom(type)) {
+  private Type getGetterType(PropertyTokenizer prop) {
+    Type type = reflector.getGetterType(prop.getName());
+    if (prop.getIndex() != null && (type instanceof Class) && Collection.class.isAssignableFrom((Class<?>) type)) {
       Type returnType = getGenericGetterType(prop.getName());
       if (returnType instanceof ParameterizedType) {
         Type[] actualTypeArguments = ((ParameterizedType) returnType).getActualTypeArguments();

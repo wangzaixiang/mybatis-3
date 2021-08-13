@@ -36,6 +36,7 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.reflection.ArrayUtil;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.ParamNameResolver;
+import org.apache.ibatis.reflection.Reflector;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.defaults.DefaultSqlSession.StrictMap;
 import org.apache.ibatis.type.JdbcType;
@@ -256,7 +257,7 @@ public class Jdbc3KeyGenerator implements KeyGenerator {
       try {
         if (typeHandler == null) {
           if (metaParam.hasSetter(propertyName)) {
-            Class<?> propertyType = metaParam.getSetterType(propertyName);
+            Class<?> propertyType = Reflector.classOfType( metaParam.getSetterType(propertyName) );
             typeHandler = typeHandlerRegistry.getTypeHandler(propertyType,
                 JdbcType.forCode(rsmd.getColumnType(columnPosition)));
           } else {

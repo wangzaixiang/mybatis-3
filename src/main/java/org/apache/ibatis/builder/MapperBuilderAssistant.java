@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
+ *    Copyright 2009-2021 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.mapping.StatementType;
 import org.apache.ibatis.reflection.MetaClass;
+import org.apache.ibatis.reflection.Reflector;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
@@ -529,7 +530,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
     if (javaType == null && property != null) {
       try {
         MetaClass metaResultType = MetaClass.forClass(resultType, configuration.getReflectorFactory());
-        javaType = metaResultType.getSetterType(property);
+        javaType = Reflector.classOfType( metaResultType.getSetterType(property) );
       } catch (Exception e) {
         // ignore, following null check statement will deal with the situation
       }
@@ -548,7 +549,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
         javaType = Object.class;
       } else {
         MetaClass metaResultType = MetaClass.forClass(resultType, configuration.getReflectorFactory());
-        javaType = metaResultType.getGetterType(property);
+        javaType = Reflector.classOfType( metaResultType.getGetterType(property) );
       }
     }
     if (javaType == null) {

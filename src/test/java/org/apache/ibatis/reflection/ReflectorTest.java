@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
+ *    Copyright 2009-2021 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ class ReflectorTest {
   void shouldResolveArraySetterParam() {
     ReflectorFactory reflectorFactory = new DefaultReflectorFactory();
     Reflector reflector = reflectorFactory.findForClass(Child.class);
-    Class<?> clazz = reflector.getSetterType("array");
+    Class<?> clazz = Reflector.classOfType( reflector.getSetterType("array") );
     assertTrue(clazz.isArray());
     assertEquals(String.class, clazz.getComponentType());
   }
@@ -129,7 +129,7 @@ class ReflectorTest {
   void shouldResolveArrayGetterType() {
     ReflectorFactory reflectorFactory = new DefaultReflectorFactory();
     Reflector reflector = reflectorFactory.findForClass(Child.class);
-    Class<?> clazz = reflector.getGetterType("array");
+    Class<?> clazz = Reflector.classOfType( reflector.getGetterType("array") );
     assertTrue(clazz.isArray());
     assertEquals(String.class, clazz.getComponentType());
   }
@@ -211,7 +211,7 @@ class ReflectorTest {
     assertEquals(String.class, reflector.getSetterType("prop1"));
     assertNotNull(reflector.getSetInvoker("prop1"));
 
-    Class<?> paramType = reflector.getSetterType("prop2");
+    Class<?> paramType = Reflector.classOfType( reflector.getSetterType("prop2") );
     assertTrue(String.class.equals(paramType) || Integer.class.equals(paramType) || boolean.class.equals(paramType));
 
     Invoker ambiguousInvoker = reflector.getSetInvoker("prop2");
@@ -244,7 +244,7 @@ class ReflectorTest {
     Invoker getInvoker = reflector.getGetInvoker("prop1");
     assertEquals(Integer.valueOf(1), getInvoker.invoke(new BeanClass(), null));
 
-    Class<?> paramType = reflector.getGetterType("prop2");
+    Class<?> paramType = Reflector.classOfType( reflector.getGetterType("prop2") );
     assertEquals(int.class, paramType);
 
     Invoker ambiguousInvoker = reflector.getGetInvoker("prop2");
@@ -276,7 +276,7 @@ class ReflectorTest {
     Invoker getInvoker = reflector.getGetInvoker("prop1");
     assertEquals(Integer.valueOf(1), getInvoker.invoke(new BeanClass(), null));
 
-    Class<?> returnType = reflector.getGetterType("prop2");
+    Class<?> returnType = Reflector.classOfType( reflector.getGetterType("prop2") );
     assertTrue(Integer.class.equals(returnType) || boolean.class.equals(returnType));
 
     Invoker ambiguousInvoker = reflector.getGetInvoker("prop2");
@@ -312,7 +312,7 @@ class ReflectorTest {
     }
     ReflectorFactory reflectorFactory = new DefaultReflectorFactory();
     Reflector reflector = reflectorFactory.findForClass(Bean.class);
-    Class<?> paramType = reflector.getSetterType("bool");
+    Class<?> paramType = Reflector.classOfType( reflector.getSetterType("bool") );
     Object[] param = boolean.class.equals(paramType) ? new Boolean[] { true } : new Integer[] { 1 };
     Invoker ambiguousInvoker = reflector.getSetInvoker("bool");
     when(() -> ambiguousInvoker.invoke(new Bean(), param));

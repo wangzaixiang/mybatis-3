@@ -16,6 +16,7 @@
 package org.apache.ibatis.executor.resultset;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Type;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -51,6 +52,7 @@ import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.mapping.ResultMapping;
 import org.apache.ibatis.reflection.MetaClass;
 import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.Reflector;
 import org.apache.ibatis.reflection.ReflectorFactory;
 import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.session.AutoMappingBehavior;
@@ -490,7 +492,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         if (value != null) {
           foundValues = true;
         }
-        if (value != null || (configuration.isCallSettersOnNulls() && !metaObject.getSetterType(property).isPrimitive())) {
+        if (value != null || (configuration.isCallSettersOnNulls() && !Reflector.classOfType( metaObject.getSetterType(property) ).isPrimitive())) {
           // gcode issue #377, call setter on nulls (value is not 'found')
           metaObject.setValue(property, value);
         }
@@ -535,13 +537,13 @@ public class DefaultResultSetHandler implements ResultSetHandler {
           if (resultMap.getMappedProperties().contains(property)) {
             continue;
           }
-          final Class<?> propertyType = metaObject.getSetterType(property);
+          final Type propertyType = metaObject.getSetterType(property) ;
           if (typeHandlerRegistry.hasTypeHandler(propertyType, rsw.getJdbcType(columnName))) {
             final TypeHandler<?> typeHandler = rsw.getTypeHandler(propertyType, columnName);
-            autoMapping.add(new UnMappedColumnAutoMapping(columnName, property, typeHandler, propertyType.isPrimitive()));
+            autoMapping.add(new UnMappedColumnAutoMapping(columnName, property, typeHandler, Reflector.classOfType(propertyType).isPrimitive()));
           } else {
             configuration.getAutoMappingUnknownColumnBehavior()
-                .doAction(mappedStatement, columnName, property, propertyType);
+                .doAction(mappedStatement, columnName, property, Reflector.classOfType(propertyType));
           }
         } else {
           configuration.getAutoMappingUnknownColumnBehavior()
@@ -827,7 +829,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     final MetaObject metaObject = configuration.newMetaObject(parameterObject);
     boolean foundValues = false;
     for (ResultMapping innerResultMapping : resultMapping.getComposites()) {
-      final Class<?> propType = metaObject.getSetterType(innerResultMapping.getProperty());
+      final Class<?> propType = Reflector.classOfType( metaObject.getSetterType(innerResultMapping.getProperty()) );
       final TypeHandler<?> typeHandler = typeHandlerRegistry.getTypeHandler(propType);
       final Object propValue = typeHandler.getResult(rs, prependPrefix(innerResultMapping.getColumn(), columnPrefix));
       // issue #353 & #560 do not execute nested query if key is null
@@ -1115,7 +1117,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     if (propertyValue == null) {
       Class<?> type = resultMapping.getJavaType();
       if (type == null) {
-        type = metaObject.getSetterType(propertyName);
+        type = Reflector.classOfType( metaObject.getSetterType(propertyName) );
       }
       try {
         if (objectFactory.isCollection(type)) {

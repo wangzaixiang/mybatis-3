@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
+ *    Copyright 2009-2021 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.apache.ibatis.executor.resultset;
 
+import java.lang.reflect.Type;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -46,7 +47,7 @@ public class ResultSetWrapper {
   private final List<String> columnNames = new ArrayList<>();
   private final List<String> classNames = new ArrayList<>();
   private final List<JdbcType> jdbcTypes = new ArrayList<>();
-  private final Map<String, Map<Class<?>, TypeHandler<?>>> typeHandlerMap = new HashMap<>();
+  private final Map<String, Map<Type, TypeHandler<?>>> typeHandlerMap = new HashMap<>();
   private final Map<String, List<String>> mappedColumnNamesMap = new HashMap<>();
   private final Map<String, List<String>> unMappedColumnNamesMap = new HashMap<>();
 
@@ -99,9 +100,9 @@ public class ResultSetWrapper {
    *          the column name
    * @return the type handler
    */
-  public TypeHandler<?> getTypeHandler(Class<?> propertyType, String columnName) {
+  public TypeHandler<?> getTypeHandler(Type propertyType, String columnName) {
     TypeHandler<?> handler = null;
-    Map<Class<?>, TypeHandler<?>> columnHandlers = typeHandlerMap.get(columnName);
+    Map<Type, TypeHandler<?>> columnHandlers = typeHandlerMap.get(columnName);
     if (columnHandlers == null) {
       columnHandlers = new HashMap<>();
       typeHandlerMap.put(columnName, columnHandlers);

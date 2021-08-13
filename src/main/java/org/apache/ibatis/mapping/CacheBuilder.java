@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2021 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import org.apache.ibatis.cache.decorators.SerializedCache;
 import org.apache.ibatis.cache.decorators.SynchronizedCache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
 import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.Reflector;
 import org.apache.ibatis.reflection.SystemMetaObject;
 
 /**
@@ -146,7 +147,7 @@ public class CacheBuilder {
         String name = (String) entry.getKey();
         String value = (String) entry.getValue();
         if (metaCache.hasSetter(name)) {
-          Class<?> type = metaCache.getSetterType(name);
+          Class<?> type = Reflector.classOfType( metaCache.getSetterType(name) );
           if (String.class == type) {
             metaCache.setValue(name, value);
           } else if (int.class == type

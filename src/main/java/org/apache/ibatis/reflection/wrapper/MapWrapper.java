@@ -15,6 +15,7 @@
  */
 package org.apache.ibatis.reflection.wrapper;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +73,7 @@ public class MapWrapper extends BaseWrapper {
   }
 
   @Override
-  public Class<?> getSetterType(String name) {
+  public Type getSetterType(String name) {
     PropertyTokenizer prop = new PropertyTokenizer(name);
     if (prop.hasNext()) {
       MetaObject metaValue = metaObject.metaObjectForProperty(prop.getIndexedName());
@@ -91,7 +92,7 @@ public class MapWrapper extends BaseWrapper {
   }
 
   @Override
-  public Class<?> getGetterType(String name) {
+  public Type getGetterType(String name) {
     PropertyTokenizer prop = new PropertyTokenizer(name);
     if (prop.hasNext()) {
       MetaObject metaValue = metaObject.metaObjectForProperty(prop.getIndexedName());

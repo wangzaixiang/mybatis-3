@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2021 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.Reflector;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
@@ -203,7 +204,7 @@ public class ResultLoaderMap {
 
         this.metaResultObject = config.newMetaObject(userObject);
         this.resultLoader = new ResultLoader(config, new ClosedExecutor(), ms, this.mappedParameter,
-                metaResultObject.getSetterType(this.property), null, null);
+          Reflector.classOfType(metaResultObject.getSetterType(this.property)), null, null);
       }
 
       /* We are using a new executor because we may be (and likely are) on a new thread

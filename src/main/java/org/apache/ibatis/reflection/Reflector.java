@@ -55,8 +55,8 @@ public class Reflector {
   private final String[] writablePropertyNames;
   private final Map<String, Invoker> setMethods = new HashMap<>();
   private final Map<String, Invoker> getMethods = new HashMap<>();
-  private final Map<String, Class<?>> setTypes = new HashMap<>();
-  private final Map<String, Class<?>> getTypes = new HashMap<>();
+  private final Map<String, Type> setTypes = new HashMap<>();
+  private final Map<String, Type> getTypes = new HashMap<>();
   private Constructor<?> defaultConstructor;
 
   private Map<String, String> caseInsensitivePropertyMap = new HashMap<>();
@@ -131,7 +131,8 @@ public class Reflector {
         : new MethodInvoker(method);
     getMethods.put(name, invoker);
     Type returnType = TypeParameterResolver.resolveReturnType(method, type);
-    getTypes.put(name, typeToClass(returnType));
+//    getTypes.put(name, typeToClass(returnType));
+    getTypes.put(name, returnType);
   }
 
   private void addSetMethods(Class<?> clazz) {
@@ -149,11 +150,22 @@ public class Reflector {
     }
   }
 
+  public static Class<?> classOfType(Type type){
+    if(type == null) return null;
+    if(type instanceof Class) return (Class<?>) type;
+
+    if(type instanceof ParameterizedType) {
+      ParameterizedType pType = (ParameterizedType) type;
+      return (Class<?>)pType.getRawType();
+    }
+    else throw new RuntimeException("classOfType");
+  }
+
   private void resolveSetterConflicts(Map<String, List<Method>> conflictingSetters) {
     for (Entry<String, List<Method>> entry : conflictingSetters.entrySet()) {
       String propName = entry.getKey();
       List<Method> setters = entry.getValue();
-      Class<?> getterType = getTypes.get(propName);
+      Class<?> getterType = classOfType( getTypes.get(propName) );
       boolean isGetterAmbiguous = getMethods.get(propName) instanceof AmbiguousMethodInvoker;
       boolean isSetterAmbiguous = false;
       Method match = null;
@@ -191,7 +203,8 @@ public class Reflector {
             property, setter2.getDeclaringClass().getName(), paramType1.getName(), paramType2.getName()));
     setMethods.put(property, invoker);
     Type[] paramTypes = TypeParameterResolver.resolveParamTypes(setter1, type);
-    setTypes.put(property, typeToClass(paramTypes[0]));
+    setTypes.put(property, paramTypes[0]);
+//    setTypes.put(property, typeToClass(paramTypes[0]));
     return null;
   }
 
@@ -199,7 +212,8 @@ public class Reflector {
     MethodInvoker invoker = new MethodInvoker(method);
     setMethods.put(name, invoker);
     Type[] paramTypes = TypeParameterResolver.resolveParamTypes(method, type);
-    setTypes.put(name, typeToClass(paramTypes[0]));
+//    setTypes.put(name, typeToClass(paramTypes[0]));
+    setTypes.put(name, paramTypes[0]);
   }
 
   private Class<?> typeToClass(Type src) {
@@ -248,7 +262,8 @@ public class Reflector {
     if (isValidPropertyName(field.getName())) {
       setMethods.put(field.getName(), new SetFieldInvoker(field));
       Type fieldType = TypeParameterResolver.resolveFieldType(field, type);
-      setTypes.put(field.getName(), typeToClass(fieldType));
+//      setTypes.put(field.getName(), typeToClass(fieldType));
+      setTypes.put(field.getName(), fieldType);
     }
   }
 
@@ -256,7 +271,8 @@ public class Reflector {
     if (isValidPropertyName(field.getName())) {
       getMethods.put(field.getName(), new GetFieldInvoker(field));
       Type fieldType = TypeParameterResolver.resolveFieldType(field, type);
-      getTypes.put(field.getName(), typeToClass(fieldType));
+//      getTypes.put(field.getName(), typeToClass(fieldType));
+      getTypes.put(field.getName(), fieldType);
     }
   }
 
@@ -383,8 +399,8 @@ public class Reflector {
    * @param propertyName - the name of the property
    * @return The Class of the property setter
    */
-  public Class<?> getSetterType(String propertyName) {
-    Class<?> clazz = setTypes.get(propertyName);
+  public Type getSetterType(String propertyName) {
+    Type clazz = setTypes.get(propertyName);
     if (clazz == null) {
       throw new ReflectionException("There is no setter for property named '" + propertyName + "' in '" + type + "'");
     }
@@ -397,8 +413,8 @@ public class Reflector {
    * @param propertyName - the name of the property
    * @return The Class of the property getter
    */
-  public Class<?> getGetterType(String propertyName) {
-    Class<?> clazz = getTypes.get(propertyName);
+  public Type getGetterType(String propertyName) {
+    Type clazz = getTypes.get(propertyName);
     if (clazz == null) {
       throw new ReflectionException("There is no getter for property named '" + propertyName + "' in '" + type + "'");
     }

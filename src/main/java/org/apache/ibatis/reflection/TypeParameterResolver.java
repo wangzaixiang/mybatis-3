@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
+ *    Copyright 2009-2021 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @author Iwao AVE!
@@ -270,6 +271,25 @@ public class TypeParameterResolver {
     public String toString() {
       return "ParameterizedTypeImpl [rawType=" + rawType + ", ownerType=" + ownerType + ", actualTypeArguments=" + Arrays.toString(actualTypeArguments) + "]";
     }
+
+    public boolean equals(Object var1) {
+      if (var1 instanceof ParameterizedType) {
+        ParameterizedType var2 = (ParameterizedType)var1;
+        if (this == var2) {
+          return true;
+        } else {
+          Type var3 = var2.getOwnerType();
+          Type var4 = var2.getRawType();
+          return Objects.equals(this.ownerType, var3) && Objects.equals(this.rawType, var4) && Arrays.equals(this.actualTypeArguments, var2.getActualTypeArguments());
+        }
+      } else {
+        return false;
+      }
+    }
+
+    public int hashCode() {
+      return Arrays.hashCode(this.actualTypeArguments) ^ Objects.hashCode(this.ownerType) ^ Objects.hashCode(this.rawType);
+    }
   }
 
   static class WildcardTypeImpl implements WildcardType {
@@ -292,6 +312,24 @@ public class TypeParameterResolver {
     public Type[] getUpperBounds() {
       return upperBounds;
     }
+
+    @Override
+    public boolean equals(Object o) {
+      if (o instanceof WildcardType) {
+        WildcardType that = (WildcardType) o;
+        return Arrays.equals(this.getLowerBounds(), that.getLowerBounds()) &&
+            Arrays.equals(this.getUpperBounds(), that.getUpperBounds());
+      } else
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+      Type [] lowerBounds = getLowerBounds();
+      Type [] upperBounds = getUpperBounds();
+
+      return Arrays.hashCode(lowerBounds) ^ Arrays.hashCode(upperBounds);
+    }
   }
 
   static class GenericArrayTypeImpl implements GenericArrayType {
@@ -305,6 +343,21 @@ public class TypeParameterResolver {
     @Override
     public Type getGenericComponentType() {
       return genericComponentType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (o instanceof GenericArrayType) {
+        GenericArrayType that = (GenericArrayType) o;
+
+        return Objects.equals(genericComponentType, that.getGenericComponentType());
+      } else
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hashCode(genericComponentType);
     }
   }
 }

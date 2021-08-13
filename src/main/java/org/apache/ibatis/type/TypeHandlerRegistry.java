@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2020 the original author or authors.
+ *    Copyright 2009-2021 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -81,6 +81,9 @@ public final class TypeHandlerRegistry {
 
     register(Boolean.class, new BooleanTypeHandler());
     register(boolean.class, new BooleanTypeHandler());
+
+    register(OptionalTypeHandler.Boolean, new OptionalTypeHandler<Boolean>(new BooleanTypeHandler()));
+
     register(JdbcType.BOOLEAN, new BooleanTypeHandler());
     register(JdbcType.BIT, new BooleanTypeHandler());
 
@@ -123,6 +126,8 @@ public final class TypeHandlerRegistry {
     register(JdbcType.NVARCHAR, new NStringTypeHandler());
     register(JdbcType.NCHAR, new NStringTypeHandler());
     register(JdbcType.NCLOB, new NClobTypeHandler());
+
+    register(OptionalTypeHandler.String, new OptionalTypeHandler<String>(new StringTypeHandler()));
 
     register(Object.class, JdbcType.ARRAY, new ArrayTypeHandler());
     register(JdbcType.ARRAY, new ArrayTypeHandler());
@@ -189,7 +194,7 @@ public final class TypeHandlerRegistry {
     this.defaultEnumTypeHandler = typeHandler;
   }
 
-  public boolean hasTypeHandler(Class<?> javaType) {
+  public boolean hasTypeHandler(Type javaType) {
     return hasTypeHandler(javaType, null);
   }
 
@@ -197,7 +202,7 @@ public final class TypeHandlerRegistry {
     return hasTypeHandler(javaTypeReference, null);
   }
 
-  public boolean hasTypeHandler(Class<?> javaType, JdbcType jdbcType) {
+  public boolean hasTypeHandler(Type javaType, JdbcType jdbcType) {
     return javaType != null && getTypeHandler((Type) javaType, jdbcType) != null;
   }
 
@@ -209,7 +214,7 @@ public final class TypeHandlerRegistry {
     return allTypeHandlersMap.get(handlerType);
   }
 
-  public <T> TypeHandler<T> getTypeHandler(Class<T> type) {
+  public <T> TypeHandler<T> getTypeHandler(Type type) {
     return getTypeHandler((Type) type, null);
   }
 
@@ -221,16 +226,16 @@ public final class TypeHandlerRegistry {
     return jdbcTypeHandlerMap.get(jdbcType);
   }
 
-  public <T> TypeHandler<T> getTypeHandler(Class<T> type, JdbcType jdbcType) {
-    return getTypeHandler((Type) type, jdbcType);
-  }
+//  public <T> TypeHandler<T> getTypeHandler(Type type, JdbcType jdbcType) {
+//    return getTypeHandler((Type) type, jdbcType);
+//  }
 
   public <T> TypeHandler<T> getTypeHandler(TypeReference<T> javaTypeReference, JdbcType jdbcType) {
     return getTypeHandler(javaTypeReference.getRawType(), jdbcType);
   }
 
   @SuppressWarnings("unchecked")
-  private <T> TypeHandler<T> getTypeHandler(Type type, JdbcType jdbcType) {
+  public <T> TypeHandler<T> getTypeHandler(Type type, JdbcType jdbcType) {
     if (ParamMap.class.equals(type)) {
       return null;
     }
